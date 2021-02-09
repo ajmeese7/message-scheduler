@@ -17,5 +17,5 @@ scheduled time of your choice, then run `node bot.js` and leave the computer on 
 it can send the message when the time rolls around :)
 
 ### TODO
-The plan is to a web interface with Discord authentication, so users can schedule 
+The plan is to implement a web interface with Discord authentication, so users can schedule 
 multiple messages via a GUI rather than one-by-one by hand.
