@@ -18,16 +18,17 @@ process.on('unhandledRejection', error => {
 });
 
 console.log("Ready to send scheduled message!");
-const client = new Discord.Client();
-client.login(config.botToken);
 
 // https://crontab.guru/
 cron.schedule(`${desired_minute} ${desired_hour} * * *`, function() {
 	console.log("Sending message...");
 
-	let guild = client.guilds.get(server_id);
-	if (guild && guild.channels.get(channel_id))
-		guild.channels.get(channel_id).send(message);
-	else
-		console.log("You fricked it up, kid. That channel ID doesn't exist in the specified server!");
+	const client = new Discord.Client();
+	client.login(config.botToken).then(() => {
+		let guild = client.guilds.get(server_id);
+		if (guild && guild.channels.get(channel_id))
+			guild.channels.get(channel_id).send(message);
+		else
+			console.log("You fricked it up, kid. That channel ID doesn't exist in the specified server!");
+	});
 });
