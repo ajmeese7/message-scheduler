@@ -4,9 +4,9 @@ const cron = require('node-cron');
 
 const server_id = 'SERVER_ID_HERE';
 const channel_id = 'CHANNEL_ID_HERE';
-const desired_hour = 07;
-const desired_minute = 15;
-const message = "Squad leader I'm hereeeeeee xD";
+const times = ["07:15", "21:45"];
+const message = "Squad leader I'm asleep ;)";
+times.forEach(time => scheduleMessage(time));
 
 process.on('unhandledRejection', error => {
 	console.error(
@@ -20,15 +20,24 @@ process.on('unhandledRejection', error => {
 console.log("Ready to send scheduled message!");
 
 // https://crontab.guru/
-cron.schedule(`${desired_minute} ${desired_hour} * * *`, function() {
-	console.log("Sending message...");
+function scheduleMessage(time) {
+	const [desired_hour, desired_minute] = time.split(":");
+	cron.schedule(`${desired_minute} ${desired_hour} * * *`, function() {
+		console.log("Sending message...");
 
-	const client = new Discord.Client();
-	client.login(config.botToken).then(() => {
-		let guild = client.guilds.get(server_id);
-		if (guild && guild.channels.get(channel_id))
-			guild.channels.get(channel_id).send(message);
-		else
-			console.log("You fricked it up, kid. That channel ID doesn't exist in the specified server!");
+		try {
+			const client = new Discord.Client();
+			client.login(config.botToken).then(() => {
+				let guild = client.guilds.get(server_id);
+				if (guild && guild.channels.get(channel_id))
+					guild.channels.get(channel_id).send(message);
+				else
+					console.log("You fricked it up, kid. That channel ID doesn't exist in the specified server!");
+			});
+
+			client.destroy();
+		} catch (error) {
+			console.error("There was an error:", error);
+		}
 	});
-});
+}
