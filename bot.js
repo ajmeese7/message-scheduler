@@ -1,4 +1,4 @@
-const Discord = require('discord.js');
+const { Client } = require('discord.js');
 const config = require('./config.json');
 const cron = require('node-cron');
 
@@ -26,18 +26,25 @@ function scheduleMessage(time) {
 		console.log("Sending message...");
 
 		try {
-			const client = new Discord.Client();
-			client.login(config.botToken).then(() => {
-				let guild = client.guilds.get(server_id);
-				if (guild && guild.channels.get(channel_id))
-					guild.channels.get(channel_id).send(message);
-				else
-					console.log("You fricked it up, kid. That channel ID doesn't exist in the specified server!");
-			});
-
-			client.destroy();
+			sendMessage();
 		} catch (error) {
 			console.error("There was an error:", error);
 		}
 	});
+}
+
+// client.on('error', console.error);
+// https://github.com/discordjs/discord.js/issues/2879
+function sendMessage() {
+	const client = new Client();
+	client.login(config.botToken).then(() => {
+		let guild = client.guilds.get(server_id);
+		if (guild && guild.channels.get(channel_id))
+			guild.channels.get(channel_id).send(message);
+		else
+			console.log("You fricked it up, kid. That channel ID doesn't exist in the specified server!");
+	}).catch(err => {
+		console.log("There was an error sending your scheduled message! Trying again...");
+		sendMessage();
+	}).finally(() => client.destroy());
 }
